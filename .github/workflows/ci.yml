@@ -30,8 +30,8 @@ jobs:
           echo 'org.gradle.vfs.watch=true' >> gradle.properties
           echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
           sed -i 's/org.gradle.unsafe.configuration-cache=true//g' gradle.properties
-          ./gradlew zipRelease
-          ./gradlew zipDebug
+          ./gradlew zipRelease--stacktrace --info
+          ./gradlew zipDebug--stacktrace --info
 
       - name: Prepare artifact
         if: success()
