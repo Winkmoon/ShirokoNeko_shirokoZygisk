@@ -1,0 +1,7 @@
+.gradle
+.idea
+.cxx
+.vscode
+build
+local.properties
+Cargo.lock

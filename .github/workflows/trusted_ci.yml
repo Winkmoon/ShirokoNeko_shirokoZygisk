@@ -1,0 +1,66 @@
+name: Trusted CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Setup keys
+        env:
+          private_key: ${{ secrets.ORG_PRIVATE_KEY }}
+          public_key: ${{ secrets.ORG_PUBLIC_KEY }}
+        run: |
+          if [ -z "$private_key" ] || [ -z "$public_key" ]; then
+            echo "Private or public key is not set."
+          else
+            echo "$private_key" | base64 -d > module/private_key
+            echo "$public_key" | base64 -d > module/public_key
+          fi
+
+      - name: Build with Gradle
+        run: |
+          echo 'org.gradle.parallel=true' >> gradle.properties
+          echo 'org.gradle.vfs.watch=true' >> gradle.properties
+          echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
+          sed -i 's/org.gradle.unsafe.configuration-cache=true//g' gradle.properties
+          ./gradlew zipRelease
+          ./gradlew zipDebug
+
+      - name: Prepare artifact
+        if: success()
+        id: prepareArtifact
+        run: |
+          releaseName=`ls module/build/outputs/release/shirokozygisk-v*-release.zip | awk -F '(/|.zip)' '{print $5}'` && echo "releaseName=$releaseName" >> $GITHUB_OUTPUT
+          debugName=`ls module/build/outputs/release/shirokozygisk-v*-debug.zip | awk -F '(/|.zip)' '{print $5}'` && echo "debugName=$debugName" >> $GITHUB_OUTPUT
+          unzip module/build/outputs/release/shirokozygisk-v*-release.zip -d zksu-release
+          unzip module/build/outputs/release/shirokozygisk-v*-debug.zip -d zksu-debug
+
+      - name: Upload release
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.prepareArtifact.outputs.releaseName }}
+          path: "./zksu-release/*"
+
+      - name: Upload debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.prepareArtifact.outputs.debugName }}
+          path: "./zksu-debug/*"

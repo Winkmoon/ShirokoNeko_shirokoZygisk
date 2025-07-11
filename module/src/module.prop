@@ -1,0 +1,6 @@
+id=${moduleId}
+name=${moduleName}
+version=${versionName}
+versionCode=${versionCode}
+author=The PerformanC Organization
+description=Standalone implementation of Zygisk.

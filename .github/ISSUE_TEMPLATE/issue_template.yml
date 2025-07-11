@@ -1,0 +1,65 @@
+name: Issue report
+description: Report an issue
+title: "[BUG]: "
+labels: ["bug", "not confirmed"]
+
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version of the shirokozygisk you're using.
+    validations:
+      required: true
+
+  - type: textarea
+    id: modules
+    attributes:
+      label: Modules
+      description: "The modules you're using following the format: moduleName by authorName version x.x.x"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: If applicable, add logs AS A FILE to help solve the issue. Most of the time it will be from logcat on boot.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmations
+      description: The following confirmations are required to open a bug report.
+      options:
+        - label: My environment meets the minimum requirements.
+          required: true
+        - label: I have verified that this is not a duplicate issue.
+          required: true
+
+  - type: checkboxes
+    id: code_of_conduct
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/PerformanC/contributing/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
